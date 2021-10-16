@@ -1,4 +1,5 @@
 ﻿using MyBook.Data.Models;
+using MyBook.Data.Paging;
 using MyBook.Data.ViewModels;
 using MyBook.Exceptions;
 using System;
@@ -15,6 +16,35 @@ namespace MyBook.Data.Services
         public PublishersService(AppDbContext context)
         {
             _context = context;
+        }
+
+        public List<Publisher> GetAllPublishers(string sortBy, string searchString, int? pageNumber) 
+        {
+            var allPublishers = _context.Publishers.OrderBy(n => n.Name).ToList();
+
+            if (!string.IsNullOrEmpty(sortBy))
+            {
+                switch (sortBy)
+                {
+                    case "name_desc":
+                        allPublishers = allPublishers.OrderByDescending(n => n.Name.Contains(searchString, 
+                            StringComparison.CurrentCultureIgnoreCase)).ToList();
+                        break;
+                    default:
+                        break;
+                }
+            }
+
+            if (!string.IsNullOrEmpty(searchString))
+            {
+                allPublishers = allPublishers.Where(n => n.Name.Contains(searchString)).ToList();
+            }
+
+            //Paging
+            int pageSize = 5;
+            allPublishers = PaginatedList<Publisher>.Create(allPublishers.AsQueryable(), pageNumber ?? 1, pageSize);
+
+            return allPublishers;
         }
 
         public Publisher AddPublisher(PublisherVM publisher)
@@ -34,10 +64,10 @@ namespace MyBook.Data.Services
 
         public Publisher GetPublisherById(int id) => _context.Publishers.FirstOrDefault(n => n.Id == id);
 
-        public PublisherwithBooksAndAuthorsVM GetPublisherData(int publisherId)
+        public PublisherWithBooksAndAuthorsVM GetPublisherData(int publisherId)
         {
             var _publisherData = _context.Publishers.Where(n => n.Id == publisherId)
-                .Select(n => new PublisherwithBooksAndAuthorsVM()
+                .Select(n => new PublisherWithBooksAndAuthorsVM()
                 {
                     Name = n.Name,
                     BookAuthors = n.Books.Select(n => new BookAuthorVM()
