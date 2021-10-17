@@ -15,7 +15,7 @@ namespace MyBook.Data.Services
             _context = context;
         }
 
-        public void AddAuthor(AuthorVM author)
+        public Author AddAuthor(AuthorVM author)
         {
             var _author = new Author()
             {
@@ -23,6 +23,7 @@ namespace MyBook.Data.Services
             };
             _context.Authors.Add(_author);
             _context.SaveChanges();
+            return _author;
         }
 
         public AuthorWithBooksVM GetAuthorWithBooksVM(int authorId)

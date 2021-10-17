@@ -1,4 +1,5 @@
-﻿using MyBook.Data.Models;
+﻿using Microsoft.EntityFrameworkCore;
+using MyBook.Data.Models;
 using MyBook.Data.ViewModels;
 using System;
 using System.Collections.Generic;
